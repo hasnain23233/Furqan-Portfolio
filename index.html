@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Furqan Ali — GoHighLevel Automation Specialist</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root[data-theme="dark"] {
     --bg: #080C18;
@@ -48,7 +48,7 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     background: var(--bg);
     color: var(--text);
     transition: background 0.4s, color 0.4s;
@@ -111,7 +111,88 @@
     position: absolute; inset: 0; z-index: 0;
     pointer-events: none;
   }
-  .hero-content { position: relative; z-index: 1; max-width: 780px; }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4rem;
+  }
+  .hero-content { flex: 1; max-width: 620px; }
+
+  /* HERO PHOTO */
+  .hero-photo-wrap {
+    flex-shrink: 0;
+    position: relative;
+    width: 340px; height: 420px;
+    animation: fadeUp 0.9s 0.35s ease both;
+  }
+  .hero-photo-wrap::before {
+    content: '';
+    position: absolute; inset: -3px; border-radius: 28px;
+    background: var(--gradient);
+    z-index: 0;
+    animation: rotateGlow 6s linear infinite;
+  }
+  @keyframes rotateGlow {
+    0%   { opacity: 0.7; filter: blur(2px); }
+    50%  { opacity: 1;   filter: blur(4px); }
+    100% { opacity: 0.7; filter: blur(2px); }
+  }
+  .hero-photo-inner {
+    position: relative; z-index: 1;
+    width: 100%; height: 100%;
+    border-radius: 26px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    background: var(--surface);
+  }
+  .hero-photo-inner img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top center;
+    display: block;
+    filter: grayscale(10%) contrast(1.05);
+    transition: filter 0.4s;
+  }
+  .hero-photo-inner:hover img { filter: grayscale(0%) contrast(1.1); }
+
+  /* Floating badge on photo */
+  .photo-badge {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 40px; padding: 10px 20px;
+    display: flex; align-items: center; gap: 10px;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    backdrop-filter: blur(12px);
+    z-index: 2;
+    animation: floatBadge 3s ease-in-out infinite;
+  }
+  @keyframes floatBadge {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-6px); }
+  }
+  .photo-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; animation: pulse 2s infinite; }
+  .photo-badge-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--text); }
+
+  /* Decorative corner accent */
+  .photo-corner {
+    position: absolute; top: -12px; right: -12px; z-index: 2;
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--gradient);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 20px var(--accent-glow);
+    animation: floatCorner 4s ease-in-out infinite;
+  }
+  @keyframes floatCorner {
+    0%,100% { transform: rotate(0deg) scale(1); }
+    50%      { transform: rotate(8deg) scale(1.08); }
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner { flex-direction: column-reverse; align-items: flex-start; }
+    .hero-photo-wrap { width: 260px; height: 320px; align-self: center; }
+  }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--accent-glow);
@@ -443,35 +524,54 @@
 <!-- HERO -->
 <section id="hero">
   <canvas class="hero-bg-canvas" id="heroCanvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      Available for New Projects
-    </div>
-    <h1 class="hero-title">
-      Building Smarter<br>
-      <span class="accent-word">CRM Systems</span><br>
-      That Close Deals
-    </h1>
-    <p class="hero-sub">
-      GoHighLevel & CloseBot specialist crafting AI-powered automations, high-converting funnels, and intelligent workflows that turn leads into loyal customers — on autopilot.
-    </p>
-    <div class="hero-ctas">
-      <a href="#contact" class="btn-primary">Work With Me →</a>
-      <a href="#experience" class="btn-secondary">View My Work</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">1yr+</div>
-        <div class="stat-label">GHL Experience</div>
+  <div class="hero-inner">
+    <!-- LEFT: Text content -->
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Available for New Projects
       </div>
-      <div class="stat-item">
-        <div class="stat-num">2</div>
-        <div class="stat-label">Companies Scaled</div>
+      <h1 class="hero-title">
+        Building Smarter<br>
+        <span class="accent-word">CRM Systems</span><br>
+        That Close Deals
+      </h1>
+      <p class="hero-sub">
+        GoHighLevel & CloseBot specialist crafting AI-powered automations, high-converting funnels, and intelligent workflows that turn leads into loyal customers — on autopilot.
+      </p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn-primary">Work With Me →</a>
+        <a href="#experience" class="btn-secondary">View My Work</a>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">100%</div>
-        <div class="stat-label">Automation Focus</div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">1yr+</div>
+          <div class="stat-label">GHL Experience</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Companies Scaled</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Automation Focus</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Photo -->
+    <div class="hero-photo-wrap">
+      <div class="photo-corner">⚡</div>
+      <div class="hero-photo-inner">
+        <img
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=680&q=80&fit=crop&crop=faces,top"
+          alt="Furqan Ali — GoHighLevel Specialist"
+          onerror="this.src='https://images.unsplash.com/photo-1560250097-0b93528c311a?w=680&q=80&fit=crop&crop=faces,top'"
+        />
+      </div>
+      <div class="photo-badge">
+        <span class="photo-badge-dot"></span>
+        <span class="photo-badge-text">Furqan Ali · GHL Specialist</span>
       </div>
     </div>
   </div>
