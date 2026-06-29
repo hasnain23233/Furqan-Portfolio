@@ -711,69 +711,236 @@
   <p>Designed & built with precision · <span>Furqan Ali</span> © 2025 · Gilgit-Baltistan, Pakistan</p>
 </footer>
 
+<style>
+  /* Custom cursor */
+  * { cursor: none !important; }
+  #cursor-dot {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #00D4FF;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.25s, height 0.25s, background 0.25s;
+    box-shadow: 0 0 12px rgba(0,212,255,0.8), 0 0 30px rgba(0,212,255,0.3);
+    mix-blend-mode: screen;
+  }
+  #cursor-ring {
+    position: fixed; pointer-events: none; z-index: 9998;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid rgba(0,212,255,0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+  }
+  body.cursor-hover #cursor-dot { width: 16px; height: 16px; background: #7C3AED; box-shadow: 0 0 20px rgba(124,58,237,0.9); }
+  body.cursor-hover #cursor-ring { width: 56px; height: 56px; border-color: rgba(124,58,237,0.4); }
+
+  /* Ripple */
+  .ripple-burst {
+    position: fixed; pointer-events: none; z-index: 9997;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rippleBurst 0.7s ease-out forwards;
+  }
+  @keyframes rippleBurst {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.7; }
+    100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+  }
+
+  /* Trail particles */
+  .trail-particle {
+    position: fixed; pointer-events: none; z-index: 9996;
+    border-radius: 50%;
+    animation: trailFade 0.6s ease-out forwards;
+  }
+  @keyframes trailFade {
+    0%   { opacity: 0.8; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
+  }
+</style>
+
+<!-- Custom cursor elements -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
 <script>
-  // Theme toggle
+  // ── THEME TOGGLE ──────────────────────────────────────────────
   const toggle = document.getElementById('themeToggle');
-  const label = document.getElementById('toggle-label');
-  const html = document.documentElement;
+  const label  = document.getElementById('toggle-label');
+  const html   = document.documentElement;
   toggle.addEventListener('click', () => {
     const isDark = html.dataset.theme === 'dark';
     html.dataset.theme = isDark ? 'light' : 'dark';
-    label.textContent = isDark ? 'Light' : 'Dark';
+    label.textContent  = isDark ? 'Light' : 'Dark';
   });
 
-  // Hero canvas animation — floating nodes with connections
+  // ── CUSTOM MAGNETIC CURSOR ────────────────────────────────────
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mouseX = -200, mouseY = -200;
+  let ringX  = -200, ringY  = -200;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
+    spawnTrailParticle(mouseX, mouseY);
+  });
+
+  // Smooth ring follow
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover detection for interactive elements
+  document.querySelectorAll('a, button, .service-card, .process-card, .edu-card, .skill-tag, .tool-chip, .contact-link').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // ── CLICK RIPPLE BURST ────────────────────────────────────────
+  document.addEventListener('click', e => {
+    const isDark = html.dataset.theme === 'dark';
+    for (let i = 0; i < 3; i++) {
+      const size = 40 + i * 40;
+      const el = document.createElement('div');
+      el.className = 'ripple-burst';
+      el.style.cssText = `
+        left:${e.clientX}px; top:${e.clientY}px;
+        width:${size}px; height:${size}px;
+        border: 1.5px solid ${i % 2 === 0 ? 'rgba(0,212,255,0.6)' : 'rgba(124,58,237,0.5)'};
+        animation-delay:${i * 0.08}s;
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+  });
+
+  // ── MOUSE TRAIL PARTICLES ─────────────────────────────────────
+  let trailCount = 0;
+  function spawnTrailParticle(x, y) {
+    trailCount++;
+    if (trailCount % 3 !== 0) return; // throttle
+    const isDark = html.dataset.theme === 'dark';
+    const colors = ['rgba(0,212,255,0.7)', 'rgba(124,58,237,0.6)', 'rgba(0,212,255,0.4)'];
+    const el = document.createElement('div');
+    el.className = 'trail-particle';
+    const size = Math.random() * 5 + 2;
+    el.style.cssText = `
+      left:${x + (Math.random()-0.5)*12}px;
+      top:${y + (Math.random()-0.5)*12}px;
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${0.4 + Math.random()*0.3}s;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  // ── HERO CANVAS — Mouse-reactive node network ─────────────────
   const canvas = document.getElementById('heroCanvas');
-  const ctx = canvas.getContext('2d');
-  let nodes = [];
-  let raf;
+  const ctx    = canvas.getContext('2d');
+  let nodes    = [];
+  let mouse    = { x: -999, y: -999 };
 
   function resize() {
-    canvas.width = canvas.offsetWidth;
+    canvas.width  = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
   }
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { resize(); createNodes(65); });
+
+  // Track mouse over hero
+  document.getElementById('hero').addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  document.getElementById('hero').addEventListener('mouseleave', () => {
+    mouse.x = -999; mouse.y = -999;
+  });
 
   function createNodes(count) {
     nodes = [];
     for (let i = 0; i < count; i++) {
       nodes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: Math.random() * 2.5 + 1
+        x:    Math.random() * canvas.width,
+        y:    Math.random() * canvas.height,
+        ox:   0, oy: 0, // origin offset (unused)
+        vx:   (Math.random() - 0.5) * 0.5,
+        vy:   (Math.random() - 0.5) * 0.5,
+        r:    Math.random() * 2.8 + 1,
+        pulse: Math.random() * Math.PI * 2
       });
     }
   }
-  createNodes(55);
+  createNodes(65);
 
-  function getAccentColor() {
-    return document.documentElement.dataset.theme === 'dark' ? '0,212,255' : '0,120,190';
-  }
-  function getVioletColor() {
-    return document.documentElement.dataset.theme === 'dark' ? '124,58,237' : '109,40,217';
-  }
+  function getAccent() { return html.dataset.theme === 'dark' ? '0,212,255'  : '0,120,190'; }
+  function getViolet() { return html.dataset.theme === 'dark' ? '124,58,237' : '109,40,217'; }
+
+  const REPEL_RADIUS = 140;
+  const ATTRACT_RADIUS = 220;
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const accent = getAccentColor();
-    const violet = getVioletColor();
+    const accent = getAccent();
+    const violet = getViolet();
+    const t = Date.now() * 0.001;
+
+    nodes.forEach(n => {
+      // Mouse repulsion / attraction
+      const dx = n.x - mouse.x;
+      const dy = n.y - mouse.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist < REPEL_RADIUS && dist > 0) {
+        // Strong repulsion close to cursor
+        const force = (REPEL_RADIUS - dist) / REPEL_RADIUS;
+        n.vx += (dx / dist) * force * 1.2;
+        n.vy += (dy / dist) * force * 1.2;
+      } else if (dist < ATTRACT_RADIUS && dist > REPEL_RADIUS) {
+        // Gentle pull toward cursor orbit
+        const force = (dist - REPEL_RADIUS) / (ATTRACT_RADIUS - REPEL_RADIUS) * 0.04;
+        n.vx -= (dx / dist) * force;
+        n.vy -= (dy / dist) * force;
+      }
+
+      // Speed cap + damping
+      const speed = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
+      if (speed > 3) { n.vx = (n.vx/speed)*3; n.vy = (n.vy/speed)*3; }
+      n.vx *= 0.97; n.vy *= 0.97;
+
+      // Move
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+      n.x = Math.max(0, Math.min(canvas.width,  n.x));
+      n.y = Math.max(0, Math.min(canvas.height, n.y));
+      n.pulse += 0.025;
+    });
 
     // Draw connections
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
-        const dx = nodes[i].x - nodes[j].x;
-        const dy = nodes[i].y - nodes[j].y;
+        const dx   = nodes[i].x - nodes[j].x;
+        const dy   = nodes[i].y - nodes[j].y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 130) {
-          const alpha = (1 - dist/130) * 0.18;
+        if (dist < 140) {
+          const alpha = (1 - dist/140) * 0.22;
+          // Lines near mouse glow brighter
+          const mdx = (nodes[i].x + nodes[j].x)/2 - mouse.x;
+          const mdy = (nodes[i].y + nodes[j].y)/2 - mouse.y;
+          const md  = Math.sqrt(mdx*mdx + mdy*mdy);
+          const boost = md < 200 ? (1 - md/200) * 0.5 : 0;
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = `rgba(${accent},${alpha})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = `rgba(${accent},${Math.min(alpha + boost, 0.7)})`;
+          ctx.lineWidth   = 0.7 + boost * 1.5;
           ctx.stroke();
         }
       }
@@ -781,50 +948,76 @@
 
     // Draw nodes
     nodes.forEach((n, i) => {
-      const color = i % 3 === 0 ? violet : accent;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${color},0.45)`;
-      ctx.fill();
+      const color   = i % 3 === 0 ? violet : accent;
+      const pulsed  = n.r + Math.sin(n.pulse) * 0.8;
+      // Nodes near mouse glow larger
+      const mdx  = n.x - mouse.x, mdy = n.y - mouse.y;
+      const md   = Math.sqrt(mdx*mdx + mdy*mdy);
+      const glow = md < 160 ? (1 - md/160) * 3 : 0;
 
-      // Update
-      n.x += n.vx; n.y += n.vy;
-      if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-      if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+      // Glow halo
+      if (glow > 0) {
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, (pulsed + glow) * 5);
+        grad.addColorStop(0, `rgba(${color},0.4)`);
+        grad.addColorStop(1, `rgba(${color},0)`);
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, (pulsed + glow) * 5, 0, Math.PI*2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, pulsed + glow * 0.8, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${color},${0.5 + glow * 0.1})`;
+      ctx.fill();
     });
 
-    raf = requestAnimationFrame(draw);
+    // Mouse aura — glowing ring around cursor
+    if (mouse.x > 0 && mouse.x < canvas.width) {
+      const auraGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, REPEL_RADIUS);
+      auraGrad.addColorStop(0,   `rgba(${accent},0.06)`);
+      auraGrad.addColorStop(0.6, `rgba(${violet},0.03)`);
+      auraGrad.addColorStop(1,   `rgba(${accent},0)`);
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, REPEL_RADIUS, 0, Math.PI*2);
+      ctx.fillStyle = auraGrad;
+      ctx.fill();
+
+      // Outer ring stroke
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, REPEL_RADIUS, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(${accent},0.12)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(draw);
   }
   draw();
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
+  // ── SCROLL REVEAL ─────────────────────────────────────────────
+  const reveals      = document.querySelectorAll('.reveal');
   const timelineItems = document.querySelectorAll('.timeline-item');
-  const allObserved = [...reveals, ...timelineItems];
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('visible');
     });
   }, { threshold: 0.12 });
 
-  allObserved.forEach(el => observer.observe(el));
+  [...reveals, ...timelineItems].forEach(el => observer.observe(el));
 
-  // Stagger service/process cards
+  // Stagger cards
   document.querySelectorAll('.service-card.reveal, .process-card.reveal, .edu-card.reveal').forEach((card, i) => {
     card.style.transitionDelay = `${i * 0.08}s`;
   });
 
-  // Active nav link on scroll
+  // ── ACTIVE NAV ────────────────────────────────────────────────
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-links a');
   window.addEventListener('scroll', () => {
     let current = '';
-    sections.forEach(sec => {
-      if (window.scrollY >= sec.offsetTop - 80) current = sec.id;
-    });
+    sections.forEach(sec => { if (window.scrollY >= sec.offsetTop - 80) current = sec.id; });
     navLinks.forEach(a => {
       a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
     });
